@@ -1,0 +1,9 @@
+syntax = "proto3";
+import "google/protobuf/wrappers.proto";
+message Message {
+	string body = 1;
+}
+service HelloWorld {
+	rpc hello (Message)
+			returns (Message);
+}

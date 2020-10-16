@@ -1,0 +1,13 @@
+version: '2.2'
+
+services:
+  grpcperf:
+    image: madusha7/echo-service-go:v1
+    #    image: madusha7/echo-service-ballerina:v1
+    container_name: grpc-echo-service
+    expose:
+      - "9099"
+    ports:
+      - 9090:9090
+    cpus: "0.5"
+    mem_limit: 768m
