@@ -1,0 +1,13 @@
+version: '2.2'
+
+services:
+  echo:
+    image: {org}/echo-service-go:latest
+    # image: org}/echo-service-bal:latest
+    container_name: echo-service
+    expose:
+      - "9090"
+    ports:
+      - 9090:9090
+    cpus: "0.5"
+    mem_limit: 768m
