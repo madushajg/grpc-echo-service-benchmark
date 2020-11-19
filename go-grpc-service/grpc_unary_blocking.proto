@@ -6,4 +6,6 @@ message Message {
 service HelloWorld {
 	rpc hello (Message)
 			returns (Message);
+	rpc bye (Message)
+		returns (Message);
 }

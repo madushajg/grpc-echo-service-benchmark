@@ -71,16 +71,17 @@ func init() {
 func init() { proto.RegisterFile("grpc_unary_blocking.proto", fileDescriptor_de8005e92fe22ac2) }
 
 var fileDescriptor_de8005e92fe22ac2 = []byte{
-	// 137 bytes of a gzipped FileDescriptorProto
+	// 146 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x4c, 0x2f, 0x2a, 0x48,
 	0x8e, 0x2f, 0xcd, 0x4b, 0x2c, 0xaa, 0x8c, 0x4f, 0xca, 0xc9, 0x4f, 0xce, 0xce, 0xcc, 0x4b, 0xd7,
 	0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x97, 0x92, 0x4b, 0xcf, 0xcf, 0x4f, 0xcf, 0x49, 0xd5, 0x07, 0xf3,
 	0x92, 0x4a, 0xd3, 0xf4, 0xcb, 0x8b, 0x12, 0x0b, 0x0a, 0x52, 0x8b, 0x8a, 0x21, 0xf2, 0x4a, 0xb2,
 	0x5c, 0xec, 0xbe, 0xa9, 0xc5, 0xc5, 0x89, 0xe9, 0xa9, 0x42, 0x42, 0x5c, 0x2c, 0x49, 0xf9, 0x29,
-	0x95, 0x12, 0x8c, 0x0a, 0x8c, 0x1a, 0x9c, 0x41, 0x60, 0xb6, 0x91, 0x26, 0x17, 0x97, 0x47, 0x6a,
+	0x95, 0x12, 0x8c, 0x0a, 0x8c, 0x1a, 0x9c, 0x41, 0x60, 0xb6, 0x91, 0x0b, 0x17, 0x97, 0x47, 0x6a,
 	0x4e, 0x4e, 0x7e, 0x78, 0x7e, 0x51, 0x4e, 0x8a, 0x90, 0x34, 0x17, 0x6b, 0x06, 0x88, 0x27, 0xc4,
-	0xa1, 0x07, 0xd5, 0x24, 0x05, 0x67, 0x25, 0xb1, 0x81, 0x0d, 0x34, 0x06, 0x04, 0x00, 0x00, 0xff,
-	0xff, 0xe7, 0xb0, 0x98, 0x69, 0x8d, 0x00, 0x00, 0x00,
+	0xa1, 0x07, 0xd5, 0x24, 0x05, 0x67, 0x09, 0x49, 0x72, 0x31, 0x27, 0x55, 0xa6, 0x62, 0x93, 0x4a,
+	0x62, 0x03, 0xdb, 0x65, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0x88, 0xa1, 0x9c, 0xe7, 0xa8, 0x00,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -96,6 +97,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type HelloWorldClient interface {
 	Hello(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error)
+	Bye(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error)
 }
 
 type helloWorldClient struct {
@@ -115,9 +117,19 @@ func (c *helloWorldClient) Hello(ctx context.Context, in *Message, opts ...grpc.
 	return out, nil
 }
 
+func (c *helloWorldClient) Bye(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error) {
+	out := new(Message)
+	err := c.cc.Invoke(ctx, "/HelloWorld/bye", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // HelloWorldServer is the server API for HelloWorld service.
 type HelloWorldServer interface {
 	Hello(context.Context, *Message) (*Message, error)
+	Bye(context.Context, *Message) (*Message, error)
 }
 
 // UnimplementedHelloWorldServer can be embedded to have forward compatible implementations.
@@ -126,6 +138,9 @@ type UnimplementedHelloWorldServer struct {
 
 func (*UnimplementedHelloWorldServer) Hello(ctx context.Context, req *Message) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Hello not implemented")
+}
+func (*UnimplementedHelloWorldServer) Bye(ctx context.Context, req *Message) (*Message, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Bye not implemented")
 }
 
 func RegisterHelloWorldServer(s *grpc.Server, srv HelloWorldServer) {
@@ -150,6 +165,24 @@ func _HelloWorld_Hello_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _HelloWorld_Bye_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Message)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HelloWorldServer).Bye(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/HelloWorld/Bye",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelloWorldServer).Bye(ctx, req.(*Message))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _HelloWorld_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "HelloWorld",
 	HandlerType: (*HelloWorldServer)(nil),
@@ -157,6 +190,10 @@ var _HelloWorld_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "hello",
 			Handler:    _HelloWorld_Hello_Handler,
+		},
+		{
+			MethodName: "bye",
+			Handler:    _HelloWorld_Bye_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
